@@ -1,0 +1,34 @@
+image: node:14.15.0
+
+variables:
+  GIT_SSL_NO_VERIFY: "1"
+  CI: 1
+  GIT_DEPTH: 10
+
+.docker-gitlab-runner: &docker-gitlab-runner
+  tags:
+    - docker
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+
+stages:
+  - prepare
+  - coding_conventions
+
+install_dependencies:
+  <<: *docker-gitlab-runner
+  stage: prepare
+  script:
+    - npm ci --silent
+  artifacts:
+    paths:
+      - node_modules/
+
+coding_standards:
+  <<: *docker-gitlab-runner
+  stage: coding_conventions
+  script:
+    - npm run lint
